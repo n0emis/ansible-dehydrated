@@ -1,26 +1,38 @@
 ---
-- name: Ensure that the letsencrypt challenge directory exists
-  file:
-    path: "{{ dehydrated_well_known_path }}/.well-known/acme-challenge"
-    state: directory
-    mode: 0755
-    owner: root
+- name: Gather OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version}}.yml"
+        - "{{ ansible_distribution|lower }}.yml"
+        - "{{ ansible_os_family|lower }}.yml"
+      skip: true
   tags:
     - dehydrated
+    - vars
 
-- name: Ensure that the letsencrypt cert directory exists
+- name: Ensure that the letsencrypt challenge and letsencrypt cert directory exists
   file:
-    path: "{{ dehydrated_cert_path }}"
+    path: "{{ item }}"
     state: directory
     mode: 0755
     owner: root
+  with_items:
+    - "{{ dehydrated_acme_challenge_path }}"
+    - "{{ dehydrated_cert_path }}"
   tags:
     - dehydrated
 
 - name: include install tasks
-  include_tasks: install_{{ ansible_distribution|lower }}.yml
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - "install_{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+    - "install_{{ ansible_distribution|lower }}.yml"
+    - "install_{{ ansible_os_family|lower }}.yml"
+    - "install_default.yml"
   tags:
     - dehydrated
+    - packages
 
 - name: Ensure that the dehydrated configuration exists
   template:
@@ -54,15 +66,15 @@
 
 - name: Download the dehydrated shell script
   get_url:
-    url: https://raw.githubusercontent.com/lukas2511/dehydrated/v0.6.1/dehydrated
+    url: "{{ dehydrated_binary }}"
     dest: /etc/ssl/letsencrypt/dehydrated
     mode: 0700
-    sha256sum: fa4a788e244b61a69f091a19430821a616de2fc1ab1be237aa15973848178fcf
+    sha256sum: "{{ dehydrated_binary_sha256 }}"
   tags:
     - dehydrated
 
 - name: Accept the Terms of Service if nessesary
-  command: ./dehydrated --register --accept-terms
+  command: ./dehydrated --register --accept-terms -f {{ dehydrated_cert_path }}/dehydrated.conf
   args:
     chdir: "{{ dehydrated_cert_path }}"
   tags:

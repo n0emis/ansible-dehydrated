@@ -1,0 +1,8 @@
+---
+- name: Ensure all dehydrated dependencies are installed
+  package:
+    name: "{{ dehydrated_dependencies }}"
+    state: present
+  tags:
+    - packages
+    - dehydrated

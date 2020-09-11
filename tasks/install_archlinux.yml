@@ -1,17 +1,9 @@
 ---
-- name: Ensure all dehydrated dependencies are installed
-  pacman:
-    pkg: "{{item}}"
-    state: present
-  with_items:
-    - openssl
-    - curl
-    - sed
-    - grep
-    - coreutils
-    - cronie
+- name: Run default dependencie installation procress
+  include_tasks: install_default.yml
   tags:
     - dehydrated
+    - packages
 
 - name: Make sure cronie is running
   service:

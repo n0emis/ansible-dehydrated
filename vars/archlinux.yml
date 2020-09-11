@@ -1,9 +1,9 @@
 ---
-# vars file for rixx.dehydrated
 dehydrated_dependencies:
   - openssl
   - curl
   - sed
   - grep
   - coreutils
+  - cronie
 

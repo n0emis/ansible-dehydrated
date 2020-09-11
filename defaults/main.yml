@@ -1,5 +1,10 @@
 ---
 dehydrated_well_known_path: /usr/share/nginx/letsencrypt
+dehydrated_acme_challenge_path: "{{ dehydrated_well_known_path }}/.well-known/acme-challenge"
 dehydrated_ssl_services:
   - nginx
 dehydrated_cert_path: /etc/ssl/letsencrypt
+
+dehydrated_binary: https://raw.githubusercontent.com/dehydrated-io/dehydrated/v0.6.5/dehydrated
+dehydrated_binary_sha256: a97b0d64d5ecc21549a58b714bb9017479b38b2e40ff51c04f1638e71291d138
+dehydrated_le_staging: false
